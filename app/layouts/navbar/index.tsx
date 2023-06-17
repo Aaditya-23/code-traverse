@@ -1,50 +1,179 @@
+import { Dialog, Listbox } from '@headlessui/react'
 import { Link } from '@remix-run/react'
-import { UserMenu } from '~/components'
+import { Logo } from '~/components'
+import { HiOutlineMenuAlt4 } from 'react-icons/hi'
+import { IoIosArrowDown } from 'react-icons/io'
+import { BsSun, BsFillMoonFill } from 'react-icons/bs'
+import { HiComputerDesktop } from 'react-icons/hi2'
+import { RxCross2 } from 'react-icons/rx'
+import { useState } from 'react'
 import type { User } from '~/db/schema.server'
 
-type NavbarProps = {
+type UserProps = {
   user: Omit<User, 'createdAt'> | null
 }
 
-export default function Navbar(props: NavbarProps) {
-  const { user } = props
+type NavbarProps = UserProps & {}
 
+export default function Navbar({ user }: NavbarProps) {
   return (
-    <nav className='mb-5 flex items-center justify-around bg-black/10 p-3 drop-shadow-md'>
-      <Link to='/home'>
-        <Logo />
-      </Link>
+    <nav className='mb-24 flex items-center justify-between p-2 sm:justify-around'>
+      <Logo />
 
-      {user ? <UserMenu user={{ name: user.name }} /> : <Login />}
+      <div className='hidden space-x-3 text-xs font-medium capitalize'>
+        <Link to='#' className='inline-block underline underline-offset-2'>
+          tests
+        </Link>
+        <Link to='#' className='inline-block underline underline-offset-2'>
+          blog
+        </Link>
+      </div>
+
+      <Menu user={user} />
     </nav>
   )
 }
 
-function Login() {
-  return (
-    <Link
-      to='/auth'
-      className='rounded-full border-2 border-black px-3 py-1 text-sm font-semibold uppercase tracking-wider'
-    >
-      login
-    </Link>
-  )
-}
+function Menu({ user }: UserProps) {
+  const [open, setOpen] = useState(true)
 
-function Logo() {
   return (
-    <svg
-      width='45'
-      height='27'
-      viewBox='0 0 45 27'
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-    >
-      <path
-        d='M32.8751 4C32.8751 4 17.2114 4 9.44696 4C1.6825 4 2.70414 22.4703 9.44696 22.4703C16.1898 22.4703 23.6677 22.4703 23.6677 22.4703M32.8751 4L45 4M32.8751 4C32.8751 6.87587 32.8751 26.5 32.8751 26.5'
-        stroke='black'
-        strokeWidth='7'
-      />
-    </svg>
+    <div className='relative'>
+      <button onClick={() => setOpen(true)}>
+        <HiOutlineMenuAlt4 size='2em' />
+      </button>
+
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <Dialog.Panel className='fixed top-0 h-screen w-full space-y-8 bg-white p-2'>
+          <header className='flex justify-end'>
+            <button onClick={() => setOpen(false)}>
+              <RxCross2 size='2em' />
+            </button>
+          </header>
+
+          {user && (
+            <Link
+              to='#'
+              className='block rounded-md border p-2 text-center text-sm capitalize hover:bg-black hover:text-white focus:bg-black focus:text-white sm:text-base'
+            >
+              contact
+            </Link>
+          )}
+
+          {!user && (
+            <Link
+              to='/auth'
+              className='block rounded-md border p-2 text-center text-sm capitalize hover:bg-black hover:text-white focus:bg-black focus:text-white sm:text-base'
+            >
+              login
+            </Link>
+          )}
+
+          <ul className='flex flex-col text-sm font-medium sm:text-lg [&_li]:py-3'>
+            {user && <li className='mb-4 text-gray-500 font-normal'>{user.email}</li>}
+            <a href='#'>
+              <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                blog
+              </li>
+            </a>
+
+            <Link to='#'>
+              <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                tests
+              </li>
+            </Link>
+
+            {user && (
+              <>
+                <Link to='#'>
+                  <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                    profile
+                  </li>
+                </Link>
+
+                <Link to='#'>
+                  <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                    account
+                  </li>
+                </Link>
+              </>
+            )}
+            <Listbox value='light' as='div' className='relative'>
+              <Listbox.Button className='w-full border-b capitalize text-gray-500 hover:bg-gray-100'>
+                <li className='flex items-center justify-between'>
+                  theme <IoIosArrowDown />
+                </li>
+              </Listbox.Button>
+
+              <Listbox.Options className='absolute mt-1 w-full rounded-md bg-white shadow-md outline outline-black/10'>
+                <Listbox.Option
+                  value={'light'}
+                  className={({ active, selected }) =>
+                    `flex items-center gap-4 p-2 capitalize ${
+                      (active || selected) && 'bg-[#F4F6F7]'
+                    }`
+                  }
+                >
+                  <BsSun />
+                  light
+                </Listbox.Option>
+                <Listbox.Option
+                  value={'system'}
+                  className={({ active, selected }) =>
+                    `flex items-center gap-4 p-2 capitalize ${
+                      (active || selected) && 'bg-[#F4F6F7]'
+                    }`
+                  }
+                >
+                  <HiComputerDesktop />
+                  system
+                </Listbox.Option>
+                <Listbox.Option
+                  value={'dark'}
+                  className={({ active, selected }) =>
+                    `flex items-center gap-4 p-2 capitalize ${
+                      (active || selected) && 'bg-[#F4F6F7]'
+                    }`
+                  }
+                >
+                  <BsFillMoonFill />
+                  dark
+                </Listbox.Option>
+              </Listbox.Options>
+            </Listbox>
+
+            {user && (
+              <>
+                <Link to='#'>
+                  <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                    my results
+                  </li>
+                </Link>
+
+                <Link to='#'>
+                  <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                    my bookings
+                  </li>
+                </Link>
+              </>
+            )}
+
+            {user ? (
+              <button>
+                <li className='border-b text-left capitalize text-gray-500 hover:bg-gray-100'>
+                  logout
+                </li>
+              </button>
+            ) : (
+              <Link to='#'>
+                <li className='border-b capitalize text-gray-500 hover:bg-gray-100'>
+                  contact
+                </li>
+              </Link>
+            )}
+          </ul>
+        </Dialog.Panel>
+      </Dialog>
+    </div>
   )
 }

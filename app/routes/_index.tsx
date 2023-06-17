@@ -1,8 +1,9 @@
-import type { V2_MetaFunction } from '@remix-run/node'
-import { Link } from '@remix-run/react'
-import { Logo } from '~/components'
+import { json, type LoaderArgs, type V2_MetaFunction } from '@remix-run/node'
+import { Link, useLoaderData } from '@remix-run/react'
 import { BsTwitter, BsGithub, BsSun, BsFillMoonFill } from 'react-icons/bs'
 import { HiComputerDesktop } from 'react-icons/hi2'
+import { Navbar } from '~/layouts'
+import { authenticator } from '~/services/auth.server'
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -11,21 +12,20 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
+export async function loader({ request }: LoaderArgs) {
+  const user = await authenticator.isAuthenticated(request)
+  if (!user) return json(user)
+
+  // const authenticatedUser = await user
+  
+}
+
 export default function Index() {
+  const user = useLoaderData<typeof loader>()
+
   return (
     <>
-      <nav className='mb-24 flex items-center justify-between p-2 sm:justify-around'>
-        <Logo />
-
-        <div className='space-x-3 text-xs font-medium capitalize sm:block'>
-          <Link to='#' className='inline-block underline underline-offset-2'>
-            tests
-          </Link>
-          <Link to='#' className='inline-block underline underline-offset-2'>
-            blog
-          </Link>
-        </div>
-      </nav>
+      <Navbar user={null} />
 
       <main className='mb-10 space-y-28 p-2'>
         <div className='space-y-8'>
