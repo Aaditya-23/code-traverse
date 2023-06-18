@@ -4,12 +4,13 @@ import { users } from '~/db/schema.server'
 import { authenticator } from '~/services/auth.server'
 import { redirect } from '@remix-run/node'
 
-export async function fetchUser(email: string) {
-  return db.select().from(users).where(eq(users.email, email))
-}
-
-export async function userExists(email: string) {
-  return (await fetchUser(email)).length > 0 ? true : false
+export async function userExistsInDb(id: string) {
+  return (await db.query.users.findFirst({
+    where: eq(users.id, id),
+    columns: { id: true },
+  }))
+    ? true
+    : false
 }
 
 export async function verifyUser(request: Request) {
@@ -17,9 +18,9 @@ export async function verifyUser(request: Request) {
 
   if (!authenticatedUser) return redirect('/auth')
 
-  const userExistsInDb = await userExists(authenticatedUser.email)
+  const userExists = await userExistsInDb(authenticatedUser.id)
 
-  if (!userExistsInDb)
+  if (!userExists)
     return authenticator.logout(request, {
       redirectTo: '/auth',
     })
@@ -28,10 +29,16 @@ export async function verifyUser(request: Request) {
 }
 
 export async function createOrLoginUser(name: string, email: string) {
-  const user = await fetchUser(email)
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+    columns: { id: true },
+  })
 
-  if (user.length > 0) return user[0]
+  if (user) return user
 
-  const newUser = await db.insert(users).values({ email, name }).returning()
+  const newUser = await db
+    .insert(users)
+    .values({ email, name })
+    .returning({ id: users.id })
   return newUser[0]
 }

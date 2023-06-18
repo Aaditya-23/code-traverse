@@ -15,7 +15,7 @@ export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
 export const tests = pgTable('tests', {
@@ -24,7 +24,7 @@ export const tests = pgTable('tests', {
   summary: text('summary').notNull(),
   questionsToAttempt: integer('questions').notNull(),
   imageUrl: text('imageUrl').notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
 export const questions = pgTable('questions', {
@@ -35,7 +35,7 @@ export const questions = pgTable('questions', {
   testId: uuid('testId')
     .references(() => tests.id)
     .notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
 export const userTests = pgTable('userTests', {
@@ -48,7 +48,7 @@ export const userTests = pgTable('userTests', {
   userId: uuid('userId')
     .references(() => users.id)
     .notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
 export const responses = pgTable('responses', {
@@ -61,7 +61,7 @@ export const responses = pgTable('responses', {
   questionId: uuid('questionId')
     .references(() => questions.id)
     .notNull(),
-  createdAt: timestamp('createdAt').defaultNow(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
 export const usersRelations = relations(users, ({ one, many }) => ({

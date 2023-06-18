@@ -35,7 +35,7 @@ export default function Navbar({ user }: NavbarProps) {
 }
 
 function Menu({ user }: UserProps) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   return (
     <div className='relative'>

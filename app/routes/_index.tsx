@@ -1,7 +1,10 @@
 import { json, type LoaderArgs, type V2_MetaFunction } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
+import { eq } from 'drizzle-orm'
 import { BsTwitter, BsGithub, BsSun, BsFillMoonFill } from 'react-icons/bs'
 import { HiComputerDesktop } from 'react-icons/hi2'
+import { db } from '~/db/drizzle.server'
+import { users } from '~/db/schema.server'
 import { Navbar } from '~/layouts'
 import { authenticator } from '~/services/auth.server'
 
@@ -13,11 +16,22 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await authenticator.isAuthenticated(request)
-  if (!user) return json(user)
+  const userFromSession = await authenticator.isAuthenticated(request)
+  if (!userFromSession) return json(null)
 
-  // const authenticatedUser = await user
-  
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userFromSession.id),
+    columns: {
+      createdAt: false,
+    },
+  })
+
+  if (!user)
+    return await authenticator.logout(request, {
+      redirectTo: '/auth',
+    })
+
+  return json(user)
 }
 
 export default function Index() {
@@ -25,7 +39,7 @@ export default function Index() {
 
   return (
     <>
-      <Navbar user={null} />
+      <Navbar user={user} />
 
       <main className='mb-10 space-y-28 p-2'>
         <div className='space-y-8'>

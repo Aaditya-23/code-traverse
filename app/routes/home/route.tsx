@@ -8,41 +8,27 @@ import { db } from '~/db/drizzle.server'
 import { tests, users } from '~/db/schema.server'
 import { Navbar } from '~/layouts'
 import { createTest } from '~/server/test.server'
-import { userExists } from '~/server/user.server'
+import { userExistsInDb } from '~/server/user.server'
 import { authenticator } from '~/services/auth.server'
 
 export async function loader({ request }: LoaderArgs) {
-  const authenticatedUser = await authenticator.isAuthenticated(request)
-  let user = null
+  const allTests = await db.query.tests.findMany({
+    columns: {
+      createdAt: false,
+    },
+  })
 
-  try {
-    if (authenticatedUser)
-      user =
-        (
-          await db
-            .select({
-              id: users.id,
-              email: users.email,
-              name: users.name,
-            })
-            .from(users)
-            .where(eq(users.id, authenticatedUser.id))
-        )[0] ?? null
-  } catch (error) {
-    if (authenticatedUser)
-      await authenticator.logout(request, {
-        redirectTo: '/auth',
-      })
-  }
+  const userFromSession = await authenticator.isAuthenticated(request)
+  if (!userFromSession) return json({ user: null, tests: allTests })
 
-  const allTests = await db
-    .select({
-      id: tests.id,
-      name: tests.name,
-      summary: tests.summary,
-      imageUrl: tests.imageUrl,
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userFromSession.id),
+  })
+
+  if (!user)
+    return await authenticator.logout(request, {
+      redirectTo: '/auth',
     })
-    .from(tests)
 
   return json({ user, tests: allTests })
 }
@@ -53,7 +39,7 @@ export default function Home() {
   return (
     <>
       <Navbar user={user} />
-      <main className='flex flex-col flex-wrap gap-4 p-2 md:flex-row'>
+      <main className='flex flex-col flex-wrap gap-4 p-2 sm:flex-row'>
         {tests.map((test, index) => (
           <TestCard test={test} key={index} />
         ))}
@@ -64,27 +50,24 @@ export default function Home() {
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData()
-
   const testId = formData.get('testId')
 
-  try {
-    invariant(testId && typeof testId === 'string')
-    const test = await db
-      .select({ id: tests.id })
-      .from(tests)
-      .where(eq(tests.id, testId))
+  invariant(testId && typeof testId === 'string', 'invalid test id')
+  const test = await db.query.tests.findFirst({
+    where: eq(tests.id, testId),
+    columns: { id: true },
+  })
 
-    if (test[0] === undefined) throw new Error()
-  } catch (error) {
-    return json({ error: 'invalid test id' })
-  }
+  if (!test) throw new Error('invalid test id')
 
-  const authenticatedUser = await authenticator.isAuthenticated(request)
+  const userFromSession = await authenticator.isAuthenticated(request)
 
-  if (authenticatedUser) {
-    const res = await userExists(authenticatedUser.email)
-    if (!res) return authenticator.logout(request, { redirectTo: '/auth' })
-    return createTest({ testId, userId: authenticatedUser.id })
+  if (userFromSession) {
+    const res = await userExistsInDb(userFromSession.id)
+    if (!res)
+      return await authenticator.logout(request, { redirectTo: '/auth' })
+
+    return createTest({ testId, userId: userFromSession.id })
   }
 
   return redirect('/auth')

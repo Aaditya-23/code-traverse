@@ -6,7 +6,7 @@ export default function Button(
   const { className, ...restProps } = props
 
   const css = twMerge(
-    'rounded-md bg-blue-500 p-2 text-xs font-bold uppercase tracking-wider text-white outline-8 outline-offset-2 outline-blue-500 disabled:bg-blue-300',
+    'rounded-md bg-blue-500 p-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-white outline-8 outline-offset-2 outline-blue-500 disabled:bg-blue-300',
     className
   )
 
