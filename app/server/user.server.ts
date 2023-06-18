@@ -14,18 +14,18 @@ export async function userExistsInDb(id: string) {
 }
 
 export async function verifyUser(request: Request) {
-  const authenticatedUser = await authenticator.isAuthenticated(request)
+  const userFromSession = await authenticator.isAuthenticated(request)
 
-  if (!authenticatedUser) return redirect('/auth')
+  if (!userFromSession) return redirect('/auth')
 
-  const userExists = await userExistsInDb(authenticatedUser.id)
+  const userExists = await userExistsInDb(userFromSession.id)
 
   if (!userExists)
     return authenticator.logout(request, {
       redirectTo: '/auth',
     })
 
-  return authenticatedUser
+  return userFromSession
 }
 
 export async function createOrLoginUser(name: string, email: string) {

@@ -1,13 +1,10 @@
 import { type LoaderArgs } from '@remix-run/node'
+import { Form } from '@remix-run/react'
 import { db } from '~/db/drizzle.server'
 import { questions } from '~/db/schema.server'
 import { Navbar } from '~/layouts'
 
-export async function loader({request}: LoaderArgs) {
-
-  
-
-  
+export async function loader({ request }: LoaderArgs) {
   return null
 }
 
@@ -20,6 +17,9 @@ export default function Admin() {
       <h3>manage admins</h3>
       <h4>edit tests</h4>
       <h4>manage bug reports and question remarks</h4>
+      <Form method='post'>
+        <button type='submit'>submit</button>
+      </Form>
     </div>
   )
 }
