@@ -1,11 +1,9 @@
 import { json, type LoaderArgs, type V2_MetaFunction } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { eq } from 'drizzle-orm'
-import { BsTwitter, BsGithub, BsSun, BsFillMoonFill } from 'react-icons/bs'
-import { HiComputerDesktop } from 'react-icons/hi2'
 import { db } from '~/db/drizzle.server'
 import { users } from '~/db/schema.server'
-import { Navbar } from '~/layouts'
+import { Footer, Navbar } from '~/layouts'
 import { authenticator } from '~/services/auth.server'
 
 export const meta: V2_MetaFunction = () => {
@@ -43,7 +41,7 @@ export default function Index() {
 
       <main className='mb-10 space-y-28 p-2'>
         <div className='space-y-8'>
-          <div className='flex flex-col items-center justify-center gap-2 text-6xl font-extrabold md:flex-row'>
+          <div className='flex flex-col items-center justify-center gap-2 text-6xl font-extrabold sm:flex-row'>
             <p className='animate-color-test bg-test-gradient bg-clip-text'>
               Test.
             </p>
@@ -51,7 +49,7 @@ export default function Index() {
               Evaluate.
             </p>
             <p className='animate-color-advance bg-advance-gradient bg-clip-text'>
-              Advance
+              Advance.
             </p>
           </div>
 
@@ -65,7 +63,7 @@ export default function Index() {
           className='text-md mx-auto block w-max rounded-lg bg-black px-4 py-2 font-medium text-white shadow hover:bg-black/80'
           to='#'
         >
-          Join Now
+          Start Now
         </Link>
 
         <section className='space-y-24'>
@@ -151,51 +149,5 @@ function Advance() {
         underperformed to become a better software engineer.
       </p>
     </div>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className='flex flex-col justify-between gap-8 border-t border-t-gray-200 bg-[#fafafa] p-2 text-gray-600'>
-      <div className='flex divide-x-2'>
-        <a href='twitter.com' className='flex h-6 w-8 place-items-center'>
-          <BsTwitter className='mx-auto' />
-        </a>
-        <a href='github.com' className='flex h-6 w-8 place-items-center'>
-          <BsGithub className='mx-auto' />
-        </a>
-      </div>
-
-      <div className='flex gap-5 text-xs'>
-        <Link to='/' className='block capitalize underline underline-offset-2'>
-          blogs
-        </Link>
-        <Link to='/' className='block capitalize underline underline-offset-2'>
-          tests
-        </Link>
-        <Link to='/' className='block capitalize underline underline-offset-2'>
-          contact us
-        </Link>
-      </div>
-
-      <p className='text-xs'>
-        Copyright Information: © 2023 CODE TRAVERSE.
-        <br /> All rights reserved.
-      </p>
-
-      <div className='flex w-max items-center gap-2 self-center rounded-full border p-2'>
-        <button>
-          <BsFillMoonFill />
-        </button>
-
-        <button>
-          <BsSun size='1.2em' />
-        </button>
-
-        <button>
-          <HiComputerDesktop size='1.2em' />
-        </button>
-      </div>
-    </footer>
   )
 }
