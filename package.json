@@ -8,7 +8,8 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.ts*\"",
     "format": "prettier -w .",
-    "generate": "drizzle-kit generate:pg"
+    "migrations:generate": "drizzle-kit generate:pg",
+    "migrations:run": "node -r esbuild-register app/db/migrate.server.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.15",
@@ -18,6 +19,7 @@
     "@remix-run/vercel": "^1.17.0",
     "@vercel/node": "^2.10.3",
     "@vercel/postgres": "^0.3.0",
+    "dotenv": "^16.3.1",
     "drizzle-orm": "^0.26.5",
     "isbot": "^3.6.8",
     "notistack": "^3.0.1",
@@ -39,6 +41,7 @@
     "@types/react-dom": "^18.0.11",
     "autoprefixer": "^10.4.14",
     "drizzle-kit": "^0.18.1",
+    "esbuild-register": "^3.4.2",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",

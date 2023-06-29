@@ -15,6 +15,7 @@ export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull(),
+  isAdmin: boolean('isAdmin').default(false).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
@@ -24,6 +25,7 @@ export const tests = pgTable('tests', {
   summary: text('summary').notNull(),
   questionsToAttempt: integer('questions').notNull(),
   imageUrl: text('imageUrl').notNull(),
+  isArchived: boolean('isArchived').default(false).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
 })
 
